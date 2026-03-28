@@ -16,6 +16,14 @@ class commissionBot:
 
         response = requests.post(self.url + "sendMessage", data=params)
     
+    def SendSticker(self, sticker):
+        params = {
+            "chat_id": self.chat_id,
+            "sticker": sticker
+        }
+
+        response = requests.post(self.url + "sendSticker", data=params)
+    
     def SendPhoto(self, photo, caption):
         params = {
             "chat_id": self.chat_id,
@@ -39,6 +47,14 @@ class commissionBot:
             "caption": caption
         }
         response = requests.post(self.url + "sendVideo", data=params)
+
+    def SendVoice(self, voice, caption):
+        params = {
+            "chat_id": self.chat_id,
+            "voice": voice,
+            "caption": caption
+        }
+        response = requests.post(self.url + "sendVoice", data=params)
 
 
     def GetUpdates(self):
@@ -88,6 +104,21 @@ class commissionBot:
                                 caption = ""
                             self.SendVideo(fileid, caption)
 
+                        if "voice" in message:
+                            voice = message["voice"]
+                            fileid = voice["file_id"]
+                            if "caption" in voice:
+                                caption = voice["caption"]
+                            else:
+                                caption = ""
+                            self.SendVoice(fileid, caption)
+
+
+                        if "sticker" in message:
+                            sticker = message["sticker"]
+                            fileid = sticker["file_id"]
+                            self.SendSticker(fileid)
+
                         else:
                             return
 
@@ -111,4 +142,4 @@ if __name__ == "__main__":
         commbot = commissionBot()
         messagesResponse = commbot.GetMessage(pastmessageid)
         pastmessageid = commbot.GetMessageId()
-        time.sleep(2)
+        time.sleep(1)

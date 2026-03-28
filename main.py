@@ -7,62 +7,77 @@ class commissionBot:
         self.token = settings.token
         self.chat_id = "795546759"
         self.url = f"https://api.telegram.org/bot{self.token}/"
+        self.keyboard = {
+        "inline_keyboard": [
+            [
+                {"text": "Approve", "callback_data": "action_approve"},
+                {"text": "Reject", "callback_data": "action_reject"}
+            ]
+        ]
+        }  
     
     def SendMessage(self, message):
         params = {
             "chat_id": self.chat_id,
-            "text": message
+            "text": message,
+            "reply_markup": self.keyboard
         }
 
-        response = requests.post(self.url + "sendMessage", data=params)
+        response = requests.post(self.url + "sendMessage", json=params)
     
     def SendSticker(self, sticker):
         params = {
             "chat_id": self.chat_id,
-            "sticker": sticker
+            "sticker": sticker,
+            "reply_markup": self.keyboard
         }
 
-        response = requests.post(self.url + "sendSticker", data=params)
+        response = requests.post(self.url + "sendSticker", json=params)
     
     def SendPhoto(self, photo, caption):
         params = {
             "chat_id": self.chat_id,
             "photo": photo,
-            "caption": caption
+            "caption": caption,
+            "reply_markup": self.keyboard
         }
-        response = requests.post(self.url + "sendPhoto", data=params)
+        response = requests.post(self.url + "sendPhoto", json=params)
 
     def SendDocument(self, document, caption):
         params = {
             "chat_id": self.chat_id,
             "document": document,
-            "caption": caption
+            "caption": caption,
+            "reply_markup": self.keyboard
         }
-        response = requests.post(self.url + "sendDocument", data=params)
+        response = requests.post(self.url + "sendDocument", json=params)
 
     def SendVideo(self, video, caption):
         params = {
             "chat_id": self.chat_id,
             "video": video,
-            "caption": caption
+            "caption": caption,
+            "reply_markup": self.keyboard
         }
-        response = requests.post(self.url + "sendVideo", data=params)
+        response = requests.post(self.url + "sendVideo", json=params)
 
     def SendVoice(self, voice, caption):
         params = {
             "chat_id": self.chat_id,
             "voice": voice,
-            "caption": caption
+            "caption": caption,
+            "reply_markup": self.keyboard
         }
-        response = requests.post(self.url + "sendVoice", data=params)
+        response = requests.post(self.url + "sendVoice", json=params)
 
     def SendAudio(self, audio, caption):
         params = {
             "chat_id": self.chat_id,
             "audio": audio,
-            "caption": caption
+            "caption": caption,
+            "reply_markup": self.keyboard
         }
-        response = requests.post(self.url + "sendAudio", data=params)
+        response = requests.post(self.url + "sendAudio", json=params)
 
     def GetUpdates(self):
         response = requests.get(self.url + "getUpdates?offset=-1")

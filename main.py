@@ -56,6 +56,13 @@ class commissionBot:
         }
         response = requests.post(self.url + "sendVoice", data=params)
 
+    def SendAudio(self, audio, caption):
+        params = {
+            "chat_id": self.chat_id,
+            "audio": audio,
+            "caption": caption
+        }
+        response = requests.post(self.url + "sendAudio", data=params)
 
     def GetUpdates(self):
         response = requests.get(self.url + "getUpdates?offset=-1")
@@ -80,11 +87,12 @@ class commissionBot:
                                 caption = photo["caption"]
                             else:
                                 caption = ""
+                            caption = caption + f"\nsent by: {sender_name}"
                             self.SendPhoto(fileid, caption)
 
                         if "text" in message: 
                             text = message["text"]
-                            self.SendMessage(f"text:{text}\nsent by:{sender_name}\nhis id is:{sender_id}")
+                            self.SendMessage(f"text:{text}\nsent by:{sender_name}")
 
                         if "document" in message:
                             document = message["document"]
@@ -93,6 +101,7 @@ class commissionBot:
                                 caption = document["caption"]
                             else:
                                 caption = ""
+                            caption = caption + f"\nsent by: {sender_name}"
                             self.SendDocument(fileid, caption)
 
                         if "video" in message:
@@ -102,6 +111,7 @@ class commissionBot:
                                 caption = video["caption"]
                             else:
                                 caption = ""
+                            caption = caption + f"\nsent by: {sender_name}"
                             self.SendVideo(fileid, caption)
 
                         if "voice" in message:
@@ -111,6 +121,7 @@ class commissionBot:
                                 caption = voice["caption"]
                             else:
                                 caption = ""
+                            caption = caption + f"\nsent by: {sender_name}"
                             self.SendVoice(fileid, caption)
 
 
@@ -118,6 +129,16 @@ class commissionBot:
                             sticker = message["sticker"]
                             fileid = sticker["file_id"]
                             self.SendSticker(fileid)
+
+                        if "audio" in message:
+                            audio = message["audio"]
+                            fileid = audio["file_id"]
+                            if "caption" in audio:
+                                caption = audio["caption"]
+                            else:
+                                caption = ""
+                            caption = caption + f"\nsent by: {sender_name}"
+                            self.SendAudio(fileid, caption)
 
                         else:
                             return
@@ -142,4 +163,4 @@ if __name__ == "__main__":
         commbot = commissionBot()
         messagesResponse = commbot.GetMessage(pastmessageid)
         pastmessageid = commbot.GetMessageId()
-        time.sleep(1)
+        time.sleep(2)

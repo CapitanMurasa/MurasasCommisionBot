@@ -8,13 +8,16 @@ class commissionBot:
         self.chat_id = "795546759"
         self.url = f"https://api.telegram.org/bot{self.token}/"
         
-        self.last_update_id = None 
+        self.last_update_id = None
+        self.keyboard = {}
         
-        self.keyboard = {
+
+    def Keyboard(self, sender_id):
+        return {
             "inline_keyboard": [
                 [
-                    {"text": "Approve", "callback_data": "action_approve"},
-                    {"text": "Reject", "callback_data": "action_reject"}
+                    {"text": "Approve", "callback_data": f"approve_{sender_id}"},
+                    {"text": "Reject", "callback_data": f"reject_{sender_id}"}
                 ]
             ]
         } 
@@ -23,6 +26,11 @@ class commissionBot:
         params = {"chat_id": self.chat_id,
                    "text": message,
                    "reply_markup": self.keyboard}
+        requests.post(self.url + "sendMessage", json=params)
+
+    def SendSystemMessage(self, message, chat_id):
+        params = {"chat_id": chat_id,
+                   "text": message}
         requests.post(self.url + "sendMessage", json=params)
     
     def SendSticker(self, sticker):
@@ -89,18 +97,23 @@ class commissionBot:
             for update in messages:
                 
                 self.last_update_id = update["update_id"]
+                pastupdateid = self.last_update_id - 1
                 
                 if "callback_query" in update:
                     callback = update["callback_query"]
                     callback_id = callback["id"]
                     button_data = callback["data"]
                     
-                    target_msg_id = callback["message"]["message_id"]
-                    
-                    if button_data == "action_approve":
-                        self.copy_message(-1003074081220, target_msg_id)
-                    elif button_data == "action_reject":
-                        print("Message Rejected")
+                    currentmessageid = callback["message"]["message_id"]
+
+                    if button_data.startswith("approve_"):
+                        original_sender_id = button_data.split("_")[1]
+                        self.copy_message(-1003074081220, currentmessageid)
+                        self.SendSystemMessage("your commision was approved!", original_sender_id)
+                        
+                    elif button_data.startswith("reject_"):
+                        original_sender_id = button_data.split("_")[1]
+                        self.SendSystemMessage("lol", original_sender_id)
                         
                     requests.post(self.url + "answerCallbackQuery", json={"callback_query_id": callback_id})
                     
@@ -108,10 +121,14 @@ class commissionBot:
                 
                 elif "message" in update:
                     message = update["message"]
-
+                    sender_id = message["from"]["id"]
                     sender_name = message["from"].get("username", "No_Username")
                     base_caption = message.get("caption", "")
                     final_caption = base_caption + f"\nsent by: {sender_name}"
+
+                    self.SendSystemMessage(f"message sent to admin! Just wait till he will aprove...", sender_id)
+                    
+                    self.keyboard = self.Keyboard(sender_id)
 
                     if "photo" in message:
                         photo = message["photo"]
@@ -120,7 +137,7 @@ class commissionBot:
 
                     elif "text" in message: 
                         text = message["text"]
-                        self.SendMessage(f"text: {text}\nsent by: {sender_name}")
+                        self.SendMessage(f"{text}\nsent by: {sender_name}")
 
                     elif "document" in message:
                         document = message["document"]

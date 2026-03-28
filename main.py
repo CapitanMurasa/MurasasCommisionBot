@@ -24,6 +24,15 @@ class commissionBot:
         }
         response = requests.post(self.url + "sendPhoto", data=params)
 
+    def SendDocument(self, document, caption):
+        params = {
+            "chat_id": self.chat_id,
+            "document": document,
+            "caption": caption
+        }
+        response = requests.post(self.url + "sendDocument", data=params)
+
+
     def GetUpdates(self):
         response = requests.get(self.url + "getUpdates?offset=-1")
         return response.json()
@@ -48,10 +57,24 @@ class commissionBot:
                             else:
                                 caption = ""
                             self.SendPhoto(fileid, caption)
-                        else: 
+
+                        if "text" in message: 
                             text = message["text"]
                             self.SendMessage(f"text:{text}\nsent by:{sender_name}\nhis id is:{sender_id}")
-                            pastmessageid = currentmessageid
+
+                        if "document" in message:
+                            document = message["document"]
+                            fileid = document["file_id"]
+                            if "caption" in document:
+                                caption = document["caption"]
+                            else:
+                                caption = ""
+                            self.SendDocument(fileid, caption)
+
+                        else:
+                            return
+
+                        pastmessageid = currentmessageid
 
     def GetMessageId(self):
         response = self.GetUpdates()

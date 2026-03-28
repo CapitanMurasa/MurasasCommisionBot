@@ -32,6 +32,14 @@ class commissionBot:
         }
         response = requests.post(self.url + "sendDocument", data=params)
 
+    def SendVideo(self, video, caption):
+        params = {
+            "chat_id": self.chat_id,
+            "video": video,
+            "caption": caption
+        }
+        response = requests.post(self.url + "sendVideo", data=params)
+
 
     def GetUpdates(self):
         response = requests.get(self.url + "getUpdates?offset=-1")
@@ -70,6 +78,15 @@ class commissionBot:
                             else:
                                 caption = ""
                             self.SendDocument(fileid, caption)
+
+                        if "video" in message:
+                            video = message["video"]
+                            fileid = video["file_id"]
+                            if "caption" in video:
+                                caption = video["caption"]
+                            else:
+                                caption = ""
+                            self.SendVideo(fileid, caption)
 
                         else:
                             return
